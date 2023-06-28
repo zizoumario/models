@@ -1,0 +1,12 @@
+{
+    "Postprocessor": {
+        "params": {
+            "clip_window": [
+                0,
+                0,
+                300,
+                300
+            ]
+        }
+    }
+}
