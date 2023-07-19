@@ -1,0 +1,29 @@
+{
+	"commands" : [
+		{
+			"command_name": "StartUploadInferenceData",
+			"parameters": {
+				"ModelId": "depth075v1_c90_01",
+				"Mode": 1,
+				"UploadMethod": "BlobStorage",
+				"FileFormat": "JPG",
+				"UploadMethodIR": "MQTT",
+				"NumberOfImages": 0,
+				"UploadInterval": 150,
+				"NumberOfInferencesPerMessage": 2,
+				"MaxDetectionsPerFrame": 5,
+				"PPLParameter": {
+					"header": {
+						"id": "00",
+						"version": "01.00.00"
+					},
+					"dnn_output_detections" : 10,
+					"max_detections" : 5,
+					"threshold" : 0.1,
+					"input_width" : 300,
+					"input_height" : 300 
+				}
+			}
+		}
+	]
+}

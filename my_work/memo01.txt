@@ -1,0 +1,108 @@
+docker run --name tf01 --mount type=bind,source=/root/bind,target=/root/bind -it tensorflow/tensorflow:1.15.5 bash
+
+■V2
+
+python object_detection/export_tflite_ssd_graph.py \
+--pipeline_config_path=../ssd_mobilenet_v2_coco_2018_03_29/pipeline.config \
+--trained_checkpoint_prefix=../ssd_mobilenet_v2_coco_2018_03_29/model.ckpt \
+--output_directory=object_detection/test01 \
+--add_postprocessing_op=true
+
+OUTPUT_FILE="object_detection/test0001/tflite/test.tflite"
+GRAPH_DEF_FILE="object_detection/test0001/tflite/tflite_graph.pb"
+INTERFACE_TYPE="FLOAT"
+INPUT_ARRAY="normalized_input_image_tensor"
+OUTPUT_ARRAYS="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3"
+INPUT_SHAPES="1,300,300,3"
+
+
+tflite_convert \
+    --output_file=object_detection/test01_v2/test.tflite \
+    --graph_def_file=object_detection/test01_v2/tflite_graph.pb \
+    --inference_type="FLOAT" \
+    --input_arrays="normalized_input_image_tensor" \
+    --input_shapes="1,300,300,3" \
+    --output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3" \
+    --default_ranges_min=0 \
+    --default_ranges_max=6 \
+    --mean_values=128 \
+    --std_dev_values=127 \
+    --allow_custom_ops
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test01_v2/test02.tflite \
+    --graph_def_file=object_detection/test01_v2/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+■V1
+
+python object_detection/export_tflite_ssd_graph.py \
+--pipeline_config_path=../ssd_mobilenet_v1_coco_2018_01_28/pipeline.config \
+--trained_checkpoint_prefix=../ssd_mobilenet_v1_coco_2018_01_28/model.ckpt \
+--output_directory=object_detection/test02_v1 \
+--add_postprocessing_op=true
+
+tflite_convert \
+    --output_file=object_detection/test02_v1/mn102.tflite \
+    --graph_def_file=object_detection/test02_v1/tflite_graph.pb \
+    --inference_type=FLOAT \
+    --input_arrays=normalized_input_image_tensor \
+    --input_shapes=1,300,300,3 \
+    --output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3" \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test02_v1/mn103.tflite \
+    --graph_def_file=object_detection/test02_v1/tflite_graph.pb \
+    --inference_type=FLOAT \
+    --input_arrays=normalized_input_image_tensor \
+    --input_shapes=1,300,300,3 \
+    --output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3" \
+    --allow_custom_ops
+
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test02_v1/mn104.tflite \
+    --graph_def_file=object_detection/test02_v1/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+
+------------- TF2
+
+
+docker run --name tf02 --mount type=bind,source=/root/bind,target=/root/bind -it tensorflow/tensorflow:2.2.0 bash
+
+
+
+
+python object_detection/export_tflite_graph_tf2.py \
+  --pipeline_config_path ../ssd_mobilenet_v2_320x320_coco17_tpu-8/pipeline.config \
+  --trained_checkpoint_dir ../ssd_mobilenet_v2_320x320_coco17_tpu-8/checkpoint \
+  --output_directory test03
+
+
+tflite_convert --saved_model_dir=test03/saved_model --output_file=test03/test03v2t2.tflite
+
+

@@ -1,0 +1,282 @@
+■V1 quant
+
+python object_detection/export_tflite_ssd_graph.py \
+--pipeline_config_path=../ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18/pipeline.config \
+--trained_checkpoint_prefix=../ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18/model.ckpt \
+--output_directory=object_detection/test03_v1 \
+--add_postprocessing_op=true
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test03_v1/mn105.tflite \
+    --graph_def_file=object_detection/test03_v1/tflite_graph.pb \
+    --inference_type=FLOAT \
+    --input_arrays=normalized_input_image_tensor \
+    --input_shapes=1,300,300,3 \
+    --output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3" \
+    --allow_custom_ops
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test03_v1/mn106.tflite \
+    --graph_def_file=object_detection/test03_v1/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+
+■V2 quant
+
+
+python object_detection/export_tflite_ssd_graph.py \
+--pipeline_config_path=../ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/pipeline.config \
+--trained_checkpoint_prefix=../ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/model.ckpt \
+--output_directory=object_detection/test04_v2 \
+--add_postprocessing_op=true
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test04_v2/mn107.tflite \
+    --graph_def_file=object_detection/test04_v2/tflite_graph.pb \
+    --inference_type=FLOAT \
+    --input_arrays=normalized_input_image_tensor \
+    --input_shapes=1,300,300,3 \
+    --output_arrays="TFLite_Detection_PostProcess,TFLite_Detection_PostProcess:1,TFLite_Detection_PostProcess:2,TFLite_Detection_PostProcess:3" \
+    --allow_custom_ops
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test04_v2/mn108.tflite \
+    --graph_def_file=object_detection/test04_v2/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+
+■v1 0.75 quant
+
+python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline.config \
+    --trained_checkpoint_prefix=../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/model.ckpt \
+    --output_directory=object_detection/test05_v1 \
+    --add_postprocessing_op=true
+
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test05_v1/mn110.tflite \
+    --graph_def_file=object_detection/test05_v1/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+
+学習
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline.config" \
+--model_dir="./object_detection/goon_data/save3" \
+--alsologtostderr 2>&1 | tee model_main01.txt
+
+学習後の出力
+python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline.config \
+    --trained_checkpoint_prefix=object_detection/goon_data/save/model.ckpt-4800 \
+    --output_directory=object_detection/goon_data/save3 \
+    --add_postprocessing_op=true 2>&1 | tee export01.txt
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/goon_data/save3/mn114.tflite \
+    --graph_def_file=object_detection/goon_data/save3/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops 2>&1 | tee conv01.txt
+
+
+tensorboard --logdir=object_detection/goon_data/save2
+
+
+後処理
+    https://github.com/SonySemiconductorSolutions/aitrios-sdk-vision-sensing-app/blob/54ce417f374c110b80c47d073d5f641b4edb095a/tutorials/4_prepare_application/1_develop/sample/param_debug/ppl_objectdetection.cpp#L487
+
+
+docker run --name tf01_tb -v /root/bind:/root/bind -p 6006:6006 -it tensorflow01_eha /bin/bash
+
+解析メモ
+
+def get_configs_from_pipeline_file(pipeline_config_path, config_override=None):
+
+学習 ０から
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline.config" \
+--model_dir="./object_detection/goon_data/save4" \
+--alsologtostderr 2>&1 | tee gakushu_02.txt
+
+
+学習 90クラスのまま fine
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline.config" \
+--model_dir="./object_detection/goon_data/save5" \
+--alsologtostderr 2>&1 | tee gakushu_03.txt
+
+学習 90クラスのまま ０から
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_zero.config" \
+--model_dir="./object_detection/goon_data/save6" \
+--alsologtostderr 2>&1 | tee gakushu_04.txt
+
+------
+
+学習 90クラスのまま fine custom
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom.config" \
+--model_dir="./object_detection/goon_data/save7" \
+--alsologtostderr 2>&1 | tee gakushu_05.txt
+
+python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom.config \
+    --trained_checkpoint_prefix=object_detection/goon_data/save7/model.ckpt-4800 \
+    --output_directory=object_detection/test08 \
+    --add_postprocessing_op=true 2>&1 | tee export05.txt
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/goon_data/save7/mn115.tflite \
+    --graph_def_file=object_detection/test08/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops 2>&1 | tee conv05.txt
+
+>random black patch
+
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom.config" \
+--model_dir="./object_detection/goon_data/save8" \
+--alsologtostderr 2>&1 | tee gakushu8_3.txt
+
+python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom.config \
+    --trained_checkpoint_prefix=object_detection/goon_data/save8/model.ckpt-4800 \
+    --output_directory=object_detection/test08 \
+    --add_postprocessing_op=true 2>&1 | tee export08.txt
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test08/mn121.tflite \
+    --graph_def_file=object_detection/test08/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops 2>&1 | tee conv08.txt
+
+>>v2 class1
+
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v2_quantized_300x300_coco_2019_01_03/pipeline_v2custom.config" \
+--model_dir="./object_detection/goon_data/save9" \
+--alsologtostderr 2>&1 | tee gakushu9_1.txt
+
+
+>>v1 class1 full
+
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18/pipeline_v1custom.config" \
+--model_dir="./object_detection/goon_data/save10" \
+--alsologtostderr 2>&1 | tee gakushu10_1.txt
+
+python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=../ssd_mobilenet_v1_quantized_300x300_coco14_sync_2018_07_18/pipeline_v1custom.config \
+    --trained_checkpoint_prefix=object_detection/goon_data/save10/model.ckpt-4800 \
+    --output_directory=object_detection/test10 \
+    --add_postprocessing_op=true 2>&1 | tee export10.txt
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test10/mn120.tflite \
+    --graph_def_file=object_detection/test10/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops 2>&1 | tee conv10.txt
+
+
+>custom arrange(from random black patch)
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom11.config" \
+--model_dir="./object_detection/goon_data/save11" \
+--alsologtostderr 2>&1 | tee gakushu11_1.txt
+
+★ベスト設定　◎
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom12.config" \
+--model_dir="./object_detection/goon_data/save12" \
+--alsologtostderr 2>&1 | tee gakushu12_1.txt
+
+python object_detection/export_tflite_ssd_graph.py \
+    --pipeline_config_path=../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom12.config \
+    --trained_checkpoint_prefix=object_detection/goon_data/save12/model.ckpt-4800 \
+    --output_directory=object_detection/test12 \
+    --add_postprocessing_op=true
+
+tflite_convert \
+    --enable_v1_converter \
+    --output_file=object_detection/test12/mn130.tflite \
+    --graph_def_file=object_detection/test12/tflite_graph.pb \
+    --input_shapes=1,300,300,3 \
+    --input_arrays=normalized_input_image_tensor \
+    --output_arrays='TFLite_Detection_PostProcess','TFLite_Detection_PostProcess:1','TFLite_Detection_PostProcess:2','TFLite_Detection_PostProcess:3' \
+    --inference_type=QUANTIZED_UINT8 \
+    --mean_values=128 \
+    --std_dev_values=128 \
+    --change_concat_input_ranges=false \
+    --allow_custom_ops
+
+----
+
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom13.config" \
+--model_dir="./object_detection/goon_data/save13" \
+--alsologtostderr 2>&1 | tee gakushu13.txt
+
+ベストの設定で、500epoch
+python object_detection/model_main.py \
+--pipeline_config_path="../ssd_mobilenet_v1_0.75_depth_quantized_300x300_coco14_sync_2018_07_18/pipeline_custom12_2.config" \
+--model_dir="./object_detection/goon_data/save12_2" \
+--alsologtostderr 2>&1 | tee gakushu12_2.txt

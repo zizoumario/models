@@ -1,0 +1,29 @@
+{
+	"commands" : [
+		{
+			"command_name": "StartUploadInferenceData",
+			"parameters": {
+				"ModelId": "ssd_mnv1_quant2",
+				"Mode": 1,
+				"UploadMethod": "BlobStorage",
+				"FileFormat": "JPG",
+				"UploadMethodIR": "MQTT",
+				"NumberOfImages": 0,
+				"UploadInterval": 1,
+				"NumberOfInferencesPerMessage": 1,
+				"MaxDetectionsPerFrame": 5,
+				"PPLParameter": {
+					"header": {
+						"id": "00",
+						"version": "01.00.00"
+					},
+					"dnn_output_detections" : 10,
+					"max_detections" : 5,
+					"threshold" : 0.1,
+					"input_width" : 300,
+					"input_height" : 300 
+				}
+			}
+		}
+	]
+}
